@@ -1,0 +1,151 @@
+泛型编程
+    所谓泛型编程，就是指独立于某些特定类型的编程，使得同一份代码适用于多种数据类型，从而提高代码重用性和灵活性。
+
+    在C++中，使用模板来实现泛型编程。
+
+
+模板 template
+    模板用于描述那些通用的行为或概念。
+    根据描述的对象不同，模板可分为：
+    函数模板
+    类模板    
+
+
+函数模板 
+    函数模板不是函数，而是用来生成函数的一种模板(机制)    
+    一般格式：
+    template<typename T1, ..., typename Tn>
+    返回类型 函数名(参数列表)
+    {
+        函数体
+    }
+    例：
+    template<typename T>
+    void swap(T&a, T& b)
+    {
+        T tmp = a;
+        a = b;
+        b = tmp;
+    }
+
+    int a = 1;
+    int b = 2;
+    swap(a, b);=> 根据实参的值，推导出模板参数的类型为int, 生成具体的函数 void swap(int&,int&), 再调用这个具体生成的函数
+
+    练习：
+        用函数模板实现常规算法
+            交换、比较、查找、最值
+            swap 
+            compare
+                比较两个对象，
+                    第一个比第二个小，则返回-1
+                    第一个比第二个大，则返回1
+                    相等，返回0
+            find
+                从一个任意类型的数组中，查找特定的值，找到则返回其下标，否则返回-1
+            max
+            min
+
+    说明：
+    1、模板声明中的 typename 用于说明其后的标识符，是一个类型的名字，也可以使用关键字 class
+    2、一般情况下，编译器能根据实参自动推导模板参数的具体类型
+        但，如果编译器无法根据实参推导出所有的模板参数，或推导出来的模板参数与期望的不一致
+        此时，需要显示的指定模板函数类型，如下：
+        函数模板名<模板参数列表>(实参列表)
+        例： 
+        template<class T>
+        T max(T a, T b)
+        {
+            return a > b ?a : b;
+        }
+        max(a, b)   // 自动推导
+        max<int>(a,b)// 显示指定
+
+    3、模板的声明与定义如果分开，则在声明与定义时都需要添加模板声明
+        且，模板的声明与定义必须出现在同一个编译单元中。
+        所以，一般的做法是把模板写在头文件中，且声明与定义一般不分开。
+
+
+    4、模板特化
+        模板特化是 通用模板的一种特殊情况,  一般如下：
+        template<>
+        返回类型 函数名(参数列表)
+        {
+            函数体 
+        }
+        模板的特化版本，必须出现在通过版本的后面。
+        例： 
+        template <typename T> // 通过版本
+        int mycompare(T a, T b)
+        {
+            if (b < a)
+                return 1;
+
+            if (a < b)
+                return -1;
+
+            return 0;
+        }
+
+        template <> // 特别版本
+        int mycompare(const char *a, const char *b)
+        {
+            if (strcmp(a, b) > 0)
+                return 1;
+
+            if (strcmp(a, b) < 0)
+                return -1;
+
+            return 0;
+        }        
+
+
+
+类模板
+    类模板不是类，而是用来生成类的一种机制
+    一般格式：
+    template<typename T1, ..., typename Tn>
+    class 类名
+    {
+    public:
+        公有方法
+    private:
+        私有数据/方法
+    };
+
+    说明： 
+        使用类模板时，必须显示的指定模板参数
+
+        当用类模板实例化对象时，是编译器自动使用模板生成类型，再用类型实例化对象
+            模板类名<模板参数列表> 对象名;
+
+        类模板的成员函数声明与定义如果分开，则它们必须出现在同一个编译单元中，且在类外定义成员函数时，必需要添加模板声明。
+
+    例：
+    template<typename T>
+    class SeqStack
+    {
+    public:
+        SeqStack(int n);
+        ~SeqStack();
+        void push(T data);
+        void pop();
+        T top() const;
+        bool empty() const;
+    private:
+        T* _data;
+        int _top;
+        int _max;
+    };
+
+    SeqStack<int> stack1(10);
+    stack1.push(1);
+    stack1.push(2);
+    stack1.push(3);
+    while (!stack1.empty())
+    {
+        cout << stack1.top() << endl;
+        stack1.pop();
+    }
+    SeqStack<std::string> stack2(5);
+

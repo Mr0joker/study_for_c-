@@ -1,6 +1,6 @@
 #include "Employee.hpp"
 #include "forwardlist.hpp"
-#include <iostream>
+
 using namespace std;
 
 int main(int argc, char *argv[])
@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
     
 
     // 没写尾插，倒过来push
-    ForwardList employees;
+    ForwardList<Employee*> employees;
     employees.push_front(&game3);
     employees.push_front(&game2);
     employees.push_front(&game1);
