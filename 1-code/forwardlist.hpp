@@ -25,6 +25,8 @@ public:
     int size() const;
     bool empty() const;
     void print() const;
+
+    
 };
 
 #endif // FORWARDLIST_HPP

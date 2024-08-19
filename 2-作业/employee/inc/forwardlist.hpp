@@ -142,6 +142,48 @@ public:
 
     template <typename T>
     friend ostream &operator<<(ostream &out, const ForwardList<T> &list);
+
+    //迭代器
+    class Iterator
+    {
+    private:
+        Node *p;
+
+    public:
+        Iterator(Node *p) : p(p) {}
+        Iterator &operator++()
+        {
+            p = p->next;
+            return *this;
+        }
+        Iterator operator++(int)
+        {
+            Iterator tmp = *this;
+            p = p->next;
+            return tmp;
+        }
+        bool operator==(const Iterator &other) const
+        {
+            return p == other.p;
+        }
+        bool operator!=(const Iterator &other) const
+        {
+            return p!= other.p;
+        }
+        ElemType &operator*() const
+        {
+            return p->data;
+        }
+    };
+
+    Iterator begin() const
+    {
+        return Iterator(head);
+    }
+    Iterator end() const
+    {
+        return Iterator(nullptr);
+    }
 };
 
 template <typename T>
