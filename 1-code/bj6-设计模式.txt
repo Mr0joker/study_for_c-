@@ -1,0 +1,163 @@
+设计模式
+    设计模式 描述了一些在编程过程中不断重复出现的问题 及这些问题的核心解决方案
+    GOF设计模式中收录了23种设计模式，根据功能，一般分为三类：
+    创建型模式
+        单例(件)模式、工厂模式、抽象工厂模式等
+
+    结构型模式
+        适配器模式、桥接模式、代理模式等
+
+    行为模式
+        迭代器模式、观察者模式、命令模式等
+
+
+
+单例模式
+    保证一个类只有一个实例，并提供一个访问该实例的全局接口
+    基本思想：
+        让类自身负责保存它的唯一实例
+        这个类可以保证没有其他实例可以被创建(通过截取创建新对象的请求)    
+        并且它可以提供一个访问该实例的方法。
+
+    实例示例：
+    1、隐藏构造函数(私有或保护)、删除拷贝操作函数
+    2、提供一个公有的静态成员函数，返回一个静态局部对象的地址或引用，即唯一的实例
+    例： 
+    class Singleton
+    {
+    public:
+        // 静态成员函数
+        static Singleton *instance()
+        {
+            // 从C++11起，静态局部对象保证线程安全
+            static Singleton s;
+
+            return &s;
+        }
+
+        void setValue(int x)
+        {
+            this->_value = x;
+        }
+        int value() const
+        {
+            return this->_value;
+        }
+
+    protected:
+        // 构造函数
+        Singleton() : _value(0) {}
+        // 删除拷贝操作
+        Singleton(const Singleton &) = delete;
+        Singleton &operator=(const Singleton &) = delete;
+
+    private:
+        int _value;
+    };    
+
+    说明：根据唯一实例的创建时机，单例可以分为：
+        惰性初始化(懒汉式)
+            第一次调用instance函数时，才创建这个唯一的对象
+        预先初始化(饿汉式)
+            只要加载单例类型，就会自动创建这个唯一的实例。
+
+
+
+
+
+
+适配器 Adapter
+    适配器模式把一个类的接口转换(适配)成另一个接口，从而在不改变原有代码的基础上复用代码
+    适配器也称为 包装器
+
+    C++标准库中，栈与队列就是使用适配器模式实现的。
+    包装链表 以实现栈，示例：
+    template<typename T>
+    class Stack
+    {
+    public:
+        void push(T data)
+        {
+            _list.push_front(data);
+        }
+        void pop()
+        {
+            _list.pop_front();
+        }
+        T top() const 
+        {
+            return _list.at(0);
+        }
+        bool empty() const
+        {
+            return _list.empty();
+        }
+    private:
+        ForwardList<T> _list; 
+    };    
+
+
+
+迭代器模式 
+    提供一种方法顺序访问聚合对象中的各个元素，同时不暴露聚合对象的内部实现。
+    基本思想：
+        将聚合对象的 访问与遍历 从聚合对象中分离出来，放到一个迭代器中。
+
+    C++标准库的一般做法：
+    1、每个聚合对象提供自己的迭代器类型(一般使用嵌套类型)
+    2、迭代器中提供一组简单但通用的接口，一般使用运算符实现 如 * += != 等
+    3、每个聚合对象 还需要提供两个专门的接口
+        begin   用于获取聚合对象中 首元素的迭代器
+        end     用于获取聚合对象的 尾后迭代器(即最后一个元素后面那个位置)
+
+    例： 
+    class String
+    {
+    public:
+        ...
+        // 嵌套的迭代器类型
+        class Iterator
+        {
+        public:
+            Iterator(char* p):p(p) {}
+            bool operator!=(const Iterator& other) const 
+            {
+                return this->p != other.p;
+            }
+            Iterator& operator++()
+            {
+                p++;
+                return *this;
+            }
+            char& operator*()
+            {
+                return *p;
+            }
+        private:
+            char* p;
+        };
+
+        // 两个专门的接口
+        Iterator begin()
+        {
+            return Iterator(_data);
+        }
+        Iterator end()
+        {
+            return Iterator(_data+size());
+        }
+    };
+
+    典型使用方式：
+    int main(int argc, char const *argv[])
+    {
+        String s1 = "hello";
+        auto it = s1.begin();
+        *it  =  'H';
+        for (auto it = s1.begin(); it != s1.end(); ++it)
+        {
+            cout << *it << " ";
+        }
+        cout << endl;
+        return 0;
+    }

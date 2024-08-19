@@ -1,189 +1,169 @@
-#ifndef VECTOR_HPP
-#define VECTOR_HPP
+#ifndef MYVECTOR_HPP
+#define MYVECTOR_HPP
 
+#include <stdexcept>
 #include <iostream>
-using namespace std;
+
 template <typename T>
 class Vector
 {
-private:
-    T *_data;
-    int _size;
-    int _capacity;
-
 public:
-    Vector() : _size(0), _capacity(0),_data(nullptr) {}
+    Vector() : _size(0), _capacity(0), _data(nullptr) {}
+
     ~Vector()
     {
-        delete[] _data;
     }
-    // 插入数据时，如果超出容量，则重新分配内存*2
-    void push_back(T data)
+    void push_back(T data) // 插入数据时，如果容量不足，则扩容
     {
         if (_data == nullptr)
         {
             _capacity = 1;
             _data = new T[_capacity];
-            _data[_size++] = data;
         }
         else
         {
-            if (_size == _capacity)
+            if (_size >= _capacity)
             {
                 _capacity *= 2;
-                T *new_data = new T[_capacity];
+                T *tmp = new T[_capacity];
                 for (int i = 0; i < _size; i++)
                 {
-                    new_data[i] = _data[i];
+                    tmp[i] = _data[i];
                 }
                 delete[] _data;
-                _data = new_data;
+                _data = tmp;
             }
-            _data[_size++] = data;
         }
+        _data[_size++] = data;
     }
-
-    // 删除最后一个元素
-    void pop_back()
-    {
-        if (_size > 0)
-        {
-            _size--;
-        }
-    }
-    // 返回最后一个元素
-    T back() const
-    {
-        if (_size > 0)
-        {
-            return data[_size - 1];
-        }
-        return T();
-    }
-    // 返回元素个数
-    int _size() const
+    void pop_back();
+    T back() const;
+    int size() const
     {
         return _size;
     }
-    // 判断是否为空
     bool empty() const
     {
         return _size == 0;
     }
-    // 返回当前容量
     int capacity() const
     {
         return _capacity;
     }
-    // 返回指定位置元素
     T at(int index) const
     {
-        if (index < 0 || index > _size - 1)
-        {
-            throw out_of_range("Error: index out of range");
-        }
+        if (index < 0 or index >= _size)
+            throw std::out_of_range("index out of range!");
         return _data[index];
     }
-    // 返回指定位置元素
-    T operator[](int index) const
+    // operator[]
+    T &operator[](int index)
     {
-        if (index < 0 || index > _size - 1)
-        {
-            throw out_of_range("Error: index out of range");
-        }
+        if (index < 0 or index >= _size)
+            throw std::out_of_range("index out of range!");
         return _data[index];
+    }
+    // operator<<
+    friend std::ostream &operator<<(std::ostream &os, const Vector<T> &vec)
+    {
+        for (int i = 0; i < vec.size(); i++)
+        {
+            os << vec.at(i) << " ";
+        }
+        return os;
     }
 
     // 拷贝构造
-    void operator=(const Vector<T> &other)
+    Vector(const Vector<T> &other)
+    {
+        _size = other._size;
+        _capacity = other._capacity;
+        _data = new T[_capacity];
+        for (int i = 0; i < _size; i++)
+        {
+            _data[i] = other._data[i];
+        }
+    }
+    // 移动构造
+    Vector(Vector<T> &&other)
+    {
+        _size = other._size;
+        _capacity = other._capacity;
+        _data = other._data;
+        other._size = 0;
+        other._capacity = 0;
+        other._data = nullptr;
+    }
+    // 拷贝赋值
+    Vector<T> &operator=(const Vector<T> &other)
     {
         if (this == &other)
-        {
-            return;
-        }
-        if (_size < other._size)
+            return *this;
+        if (_capacity < other._size)
         {
             delete[] _data;
-            _data = new T[other._size];
             _capacity = other._size;
+            _data = new T[_capacity];
         }
         _size = other._size;
         for (int i = 0; i < _size; i++)
         {
-            data[i] = other.data[i];
+            _data[i] = other._data[i];
         }
-    }
-    // 拷贝赋值
-    void operator+=(const Vector<T> &other)
-    {
-        if (this == &other)
-        {
-            return;
-        }
-        if (_size + other._size > _capacity)
-        {
-            delete[] _data;
-            _data = new T[_size + other._size];
-            _capacity = _size + other._size;
-        }
-        for (int i = 0; i < other._size; i++)
-        {
-            data[_size + i] = other.data[i];
-        }
-        _size += other._size;
-    }
-    // 移动构造
-    void operator=(Vector<T> &&other)
-    {
-        if (this == &other)
-        {
-            return;
-        }
-        delete[] _data;
-        _data = other.data;
-        _size = other._size;
-        _capacity = other._capacity;
-        other.data = nullptr;
-        other._size = 0;
-        other._capacity = 0;
+        return *this;
     }
     // 移动赋值
-    void operator+=(Vector<T> &&other)
+    Vector<T> &operator=(Vector<T> &&other)
     {
         if (this == &other)
-        {
-            return;
-        }
-        if (_size + other._size > _capacity)
-        {
-            delete[] _data;
-            _data = new T[_size + other._size];
-            _capacity = _size + other._size;
-        }
-        for (int i = 0; i < other._size; i++)
-        {
-            _data[_size + i] = other.data[i];
-        }
-        _size += other._size;
-        other._data = nullptr;
-        other.__size = 0;
+            return *this;
+        delete[] _data;
+        _size = other._size;
+        _capacity = other._capacity;
+        _data = other._data;
+        other._size = 0;
         other._capacity = 0;
+        other._data = nullptr;
+        return *this;
     }
 
-    // 友元函数
-    template <typename U>
-    friend ostream &operator<<(ostream &out, const Vector<U> &vec);
+    // 嵌套的迭代器类型
+    class Iterator
+    {
+    public:
+        Iterator(T *p) : p(p) {}
+        bool operator!=(const Iterator &other) const
+        {
+            return this->p != other.p;
+        }
+        Iterator &operator++()
+        {
+            p++;
+            return *this;
+        }
+        T &operator*()
+        {
+            return *p;
+        }
+
+    private:
+        T *p;
+    };
+
+    // 两个专门的接口
+    Iterator begin()
+    {
+        return Iterator(_data);
+    }
+    Iterator end()
+    {
+        return Iterator(_data + _size);
+    }
+
+private:
+    T *_data;
+    int _size;     // 当前元素的个数
+    int _capacity; // 最多能存放多少个元素
 };
 
-template <typename U>
-ostream &operator<<(ostream &out, const Vector<U> &vec)
-{
-    typename Vector<U>::const_iterator it = vec.begin();
-    for (; it!= vec.end(); it++)
-    {
-        out << *it << " ";
-    }
-    return out;
-}
-
-#endif // VECTOR_HPP
+#endif
