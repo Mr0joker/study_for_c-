@@ -18,7 +18,7 @@ public:
     //access function
     int getX() const;    //获取坐标
     int getY() const;    //获取坐标
-    string Point::getColor() const;    //获取颜色
+    string getColor() const;    //获取颜色
     void setX(int x);    //设置坐标
     void setY(int y);    //设置坐标
     void setColor(string color);    //设置颜色

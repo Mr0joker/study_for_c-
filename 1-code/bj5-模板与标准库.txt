@@ -149,3 +149,42 @@
     }
     SeqStack<std::string> stack2(5);
 
+
+
+    练习： 
+    用类模板实现一个动态数组
+
+    template<typename T>
+    class Vector
+    {
+    public:
+        Vector();
+        ~Vector();
+        void push_back(T data); // 插入数据时，如果容量不足，则扩容
+        void pop_back();
+        T back() const;
+        int size() const;
+        bool empty() const;
+        int capacity() const;
+        T at(int index) const;
+        operator[]
+        operator<<
+
+        拷贝构造
+        拷贝赋值
+        移动构造
+        移动赋值
+    private:
+        T* _data;
+        int _size; // 当前元素的个数
+        int _capacity;// 最多能存放多少个元素
+    };
+
+    Vector<int> a;
+    a.push_back(1);
+    a.push_back(2);
+    for (int i = 0; i < a.size(); i++)
+    {
+        cout << a.at(i) << endl;
+    }
+    cout << a << endl;
